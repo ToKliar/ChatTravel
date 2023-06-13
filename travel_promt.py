@@ -14,24 +14,32 @@
 # + 安全提示
 
 from gpt4all import GPT4All
+import sys
+from prettytable import PrettyTable
 
-gptj = GPT4All("ggml-gpt4all-j-v1.3-groovy", "../gpt4all_model/")
+def get_travel_tips(args):
+    gptj = GPT4All("ggml-gpt4all-j-v1.3-groovy", "../gpt4all_model/")
 
-location = "New York"
-date = "June 3"
-duration = "3-day"
-budget = "$600"
+    location = " ".join(args.location)
+    date = " ".join(args.date)
+    duration = "{}-day".format(args.duration)
+    budget = "${}".format(args.budget)
 
-assumption = "Now you are my travel assistant and guide."
-background = "I am planning a {} trip to {} starting from {}, with a budget of {}.".format(duration, location, date, budget)
-need = '''Please give the local weather conditions at that time and recommend what to bring according to the weather conditions.
-In addition, please recommend the appropriate mode of transportation based on the travel information and weather conditions provided above.
-Finally, based on the above information, please give some safety tips during the tour.'''
-output = "Please output date, weather condition, recommended items to bring, recommended transportation, safety tips for the first day of the trip in table format."
-promt = "\n".join([assumption, background, need, output])
-messages = [{"role": "user", "content": promt}]
-table_response = gptj.chat_completion(messages, verbose=False, streaming=False)
-response = table_response['choices'][0]['message']['content']
-first_day = response.split("||")[2].strip()
-date, weather, bring, tranportation, tips = first_day.split('|')
-print(date, weather, bring, tranportation, tips)
+    assumption = "Now you are my travel assistant and guide."
+    background = "I am planning a {} trip to {} starting from {}, with a budget of {}.".format(duration, location, date, budget)
+    need = '''Please give the local weather conditions at that time and recommend what to bring according to the weather conditions.
+    In addition, please recommend the appropriate mode of transportation based on the travel information and weather conditions provided above.
+    Finally, based on the above information, please give some safety tips during the tour.'''
+    output = "Please output date, weather condition, recommended items to bring, recommended transportation, safety tips for the first day of the trip in table format."
+    promt = "\n".join([assumption, background, need, output])
+    messages = [{"role": "user", "content": promt}]
+    table_response = gptj.chat_completion(messages, verbose=False, streaming=False)
+    response = table_response['choices'][0]['message']['content']
+    first_day = response.split("||")[2].strip()
+    date, weather, bring, tranportation, tips = first_day.split('|')
+    # sys.en
+    # sys.setdefaultencoding('utf8')
+    
+    table = PrettyTable(['date','weather','recommended items','recommended transportation', 'safety tips'])
+    table.add_row([date, weather, bring, tranportation, tips])
+    print(table)
