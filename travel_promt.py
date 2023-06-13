@@ -19,11 +19,19 @@ gptj = GPT4All("ggml-gpt4all-j-v1.3-groovy", "../gpt4all_model/")
 
 location = "New York"
 date = "June 3"
-duration = "3 day"
+duration = "3-day"
 budget = "$600"
 
 assumption = "Now you are my travel assistant and guide."
-background = ""
-promt = "Now you are my travel assistant and guide, I am planning a {} trip to {} on {}, with a budget of {}.Please give the local weather conditions at that time and give some travel suggestions based on the weather conditions".format(duration, location, date, budget)
+background = "I am planning a {} trip to {} starting from {}, with a budget of {}.".format(duration, location, date, budget)
+need = '''Please give the local weather conditions at that time and recommend what to bring according to the weather conditions.
+In addition, please recommend the appropriate mode of transportation based on the travel information and weather conditions provided above.
+Finally, based on the above information, please give some safety tips during the tour.'''
+output = "Please output date, weather condition, recommended items to bring, recommended transportation, safety tips for the first day of the trip in table format."
+promt = "\n".join([assumption, background, need, output])
 messages = [{"role": "user", "content": promt}]
-print(gptj.chat_completion(messages))
+table_response = gptj.chat_completion(messages, verbose=False, streaming=False)
+response = table_response['choices'][0]['message']['content']
+first_day = response.split("||")[2].strip()
+date, weather, bring, tranportation, tips = first_day.split('|')
+print(date, weather, bring, tranportation, tips)
