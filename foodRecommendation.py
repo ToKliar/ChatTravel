@@ -1,3 +1,4 @@
+from gpt4all import GPT4All
 def getFoodBudget():
     restaurantType = input(
         '''Enter the number of the option you like to learn about:
@@ -21,18 +22,18 @@ def getfood_preference():
     return preference
 
 
-def recommend_restaurant(destination):
+def recommend_restaurant(destination,preference):
     model_path = '/content/drive/My Drive/chattravel'
     gptj = GPT4All("ggml-gpt4all-j-v1.3-groovy", model_path)
     budget = getFoodBudget()
-    preference = getfood_preference()
+    preference = preference
     prompt = f"""
-    Now you are my travel assistant and guide. 
+    Now you are my travel assistant and guide.
     Recommend some  restaurants  in {destination}  ,
-    considering taste preferences : {preference} 
+    considering taste preferences : {preference}
     and budget is {budget}
-    output the restaurant with their location and restraurant  as a list.
-    you can attach their 
+    output the result with restaurant's location and per capita consumption  as a table.
+  
     """
     messages = [{"role": "user", "content": prompt}]
     response = gptj.chat_completion(messages, verbose=False, streaming=False)
@@ -41,7 +42,14 @@ def recommend_restaurant(destination):
 
 
 if __name__ == "__main__":
-    destination = input("Enter your preferred destination: ")
-    preference = input("Enter your taste preferences: ")
+    destination = input("Enter your preferred destination: \n")
+    preference = input("Enter your taste preferences:\n ")
 
-    print(recommend_restaurant(destination, preference))
+    recommendation = recommend_restaurant(destination,preference)
+    print(recommendation)
+    result = input("do you want to save the result as a file(yes or no))")
+    if result == "yes":
+        with open('/content/drive/My Drive/chattravel/restaurant.txt', 'w') as f:
+            f.write(' restaurant:\n\n')
+            f.write(recommendation)
+            print("recommendation is saved in /content/drive/My Drive/chattravel/restaurant.txt ")
