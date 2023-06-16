@@ -1,17 +1,40 @@
-import math
-import argparse
-from travel_promt import get_travel_tips
+from config import *
+from gpt4all import GPT4All
+from travel_plan_design import recommend_travel_plan
+from restaurant_recommendation import recommend_restaurant
+from activity_recommendation import recommend_activities
+from destination_recommendation import recommend_destination
+from hotel_recommendation import recommend_hotel
+from travel_tip import recommend_travel_tips
 
-parser = argparse.ArgumentParser(description="travel assistant")
-# 为功能 6 添加子命令行 
-sub_parsers = parser.add_subparsers(help='sub command help')
-parser_travel_tips = sub_parsers.add_parser('tips', help='give travel tips according to travel information')
-parser_travel_tips.add_argument('-d', '--date', type=str, required=True, nargs='+', help='travel start date',metavar='June 3rd')
-parser_travel_tips.add_argument('-l', '--location', type=str, required=True, nargs='+', help='travel location',metavar='New York')
-parser_travel_tips.add_argument('-s', '--duration', type=int, default=3,required=True, help='travel duration (day)', metavar='3')
-parser_travel_tips.add_argument('-b', '--budget', type=int, default=2000, required=True, help='travel budget', metavar='2000')
-parser_travel_tips.set_defaults(func=get_travel_tips)
-
-
-args = parser.parse_args()
-args.func(args)
+if __name__ == "__main__":
+    gptj = GPT4All(model_name, model_path)
+    while True:
+        function = input('''
+This is travel helper to help you better plan your visit using local LLM.
+Please enter a number to choose what function you want to use:
+1. Design Travel Plan
+2. Recommend Restaurants
+3. Recommend Local Activities
+4. Recommend Travel Destination
+5. Recommend Acommodation
+6. Get Some Travel Tips
+You can enter 0 to quit.
+''')
+        if function.isdigit() and len(function) == 1:
+            if function == '0':
+                break
+            if function == '1':
+                recommend_travel_plan(gptj)
+            elif function == '2':
+                recommend_restaurant(gptj)
+            elif function == '3':
+                recommend_activities(gptj)
+            elif function == '4':
+                recommend_destination(gptj)
+            elif function == '5':
+                recommend_hotel(gptj)
+            elif function == '6':
+                recommend_travel_tips(gptj)
+        else:
+            print("Please enter as required.")
